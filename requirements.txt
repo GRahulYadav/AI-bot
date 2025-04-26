@@ -1,7 +1,7 @@
-chromadb
-langchain
-unstructured
-unstructured[local-inference]
 streamlit
 streamlit-chat
+langchain
+langchain-community
+pymupdf
 cohere
+chromadb
