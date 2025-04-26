@@ -2,7 +2,7 @@
 import os
 import streamlit as st
 from streamlit_chat import message
-from langchain.document_loaders import OnlinePDFLoader
+from langchain.document_loaders import PyMuPDFLoader  # Updated here
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.vectorstores import Chroma
 from langchain.chains import RetrievalQA
@@ -15,10 +15,9 @@ st.set_page_config(page_title="🌴 ECO-AGRI BOT ", page_icon=":smile:")
 if not os.path.exists("./tempfolder"):
     os.makedirs("./tempfolder")
 
-pdf_file_path = 'tempfolder/pmt.pdf' 
-
-pdf_file_path2 = 'tempfolder/Chemicals.pdf' 
-pdf_file_path3 = 'tempfolder/agrigpt.pdf' 
+pdf_file_path = 'tempfolder/pmt.pdf'
+pdf_file_path2 = 'tempfolder/Chemicals.pdf'
+pdf_file_path3 = 'tempfolder/agrigpt.pdf'
 
 st.markdown(
     "<h1 style='text-align: center; background-color:#85B88F; padding: 20px; color: white; border-radius: 10px;'>ECO-AGRI BOT 🌴</h1>",
@@ -47,7 +46,6 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-
 st.markdown("""
 <style>
     .message-container {
@@ -67,15 +65,14 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-
-# Initialzing Text Splitter
+# Initializing Text Splitter
 text_splitter = CharacterTextSplitter(chunk_size=300, chunk_overlap=10)
 
-# Intializing Cohere Embdedding
+# Initializing Cohere Embedding
 embeddings = CohereEmbeddings(model="large", cohere_api_key=st.secrets["cohere_apikey"])
 
 def PDF_loader(document):
-    loader = OnlinePDFLoader(document)
+    loader = PyMuPDFLoader(document)  # Updated here
     documents = loader.load()
     prompt_template = """ 
     You are an AI Chatbot developed to help users by suggesting eco-friendly farming methods, alternatives to chemical pesticides and fertilizers, and maximizing profits. Use the following pieces of context to answer the question at the end. Greet Users!!
@@ -125,7 +122,6 @@ welcome_message = f"Hello, {user_name}! I am ECO-AGRI BOT, and I'm here to help 
 def generate_response(query):
     result = qa({"query": query, "chat_history": st.session_state["chat_history"]})
     result["result"] = result["result"]
-
     return result["result"]
 
 response_container = st.container()
@@ -142,7 +138,7 @@ with container:
             st.session_state["past"].append(user_input)
             st.session_state["generated"].append(output)
             st.session_state["chat_history"] = [(user_input, output)]
-        
+
 if st.session_state["generated"]:
     with response_container:
         message(
@@ -153,11 +149,11 @@ if st.session_state["generated"]:
         )
         for i in range(len(st.session_state["generated"])):
             message(
-            st.session_state["past"][i],
-            is_user=True,
-            key=str(i) + "_user",
-            avatar_style="adventurer",
-            seed=123,
+                st.session_state["past"][i],
+                is_user=True,
+                key=str(i) + "_user",
+                avatar_style="adventurer",
+                seed=123,
             )
             message(st.session_state["generated"][i], key=str(i))
 
@@ -168,11 +164,10 @@ if clear_button:
     st.session_state["past"] = []
     st.session_state["chat_history"] = []
 
-
 # Add background from URL
 def add_bg_from_url():
     st.markdown(
-         f"""
+        f"""
          <style>
          .stApp {{
              background-image: url("https://www.pixelstalk.net/wp-content/uploads/images6/Dark-Desktop-Backgrounds-Aesthetic-HD-Free-download.jpg");
@@ -181,7 +176,7 @@ def add_bg_from_url():
          }}
          </style>
          """,
-         unsafe_allow_html=True
-     )
+        unsafe_allow_html=True
+    )
 
 add_bg_from_url()
